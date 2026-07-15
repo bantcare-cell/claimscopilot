@@ -1,0 +1,16 @@
+# virtual environment — recreated with: python -m venv .venv && pip install -r requirements.txt
+.venv/
+
+# python bytecode cache
+__pycache__/
+*.pyc
+
+# generated data & local databases — reproducible via generate_data.py / pipeline.py
+claims_raw.csv
+*.db
+
+# secrets — API keys live here, NEVER in git
+.env
+
+# logs
+*.log
