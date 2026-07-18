@@ -2,7 +2,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import sqlite3
 import pandas as pd
+import os
+from dotenv import load_dotenv
+from groq import Groq
 from uvicorn import run
+
+load_dotenv()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 app = FastAPI(title="ClaimsCopilot")
 
 claims_db = []
@@ -56,3 +63,20 @@ def analytics_top_providers():
     """, conn)
     conn.close()
     return top_providers.to_dict(orient="records")
+
+class Question(BaseModel):
+    text: str
+
+
+@app.post("/ask")
+def ask(question: Question):
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        temperature=0.2,
+        messages=[
+            {"role": "system", "content": "You are ClaimsCopilot, an assistant for a health insurance claims team. Answer only questions about health insurance claims and policies, in plain, simple language. If a question is not about claims or insurance, politely say that it's outside what you can help with. Never give medical advice."},
+            {"role": "user", "content": question.text},
+        ],
+    )
+    answer = response.choices[0].message.content
+    return {"question": question.text, "answer": answer}
