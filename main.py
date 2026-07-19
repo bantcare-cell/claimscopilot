@@ -19,12 +19,16 @@ from dotenv import load_dotenv
 from groq import Groq
 import chromadb
 from sentence_transformers import SentenceTransformer
+import joblib
 
 # ---------------------------------------------------------------------------
 # Startup: heavy resources are created ONCE here, never inside a request
 # handler — loading the embedding model takes seconds, and paying that cost
 # on every request would make every question slow.
 # ---------------------------------------------------------------------------
+
+# Denial-risk model trained by train_model.py.
+denial_model, model_columns = joblib.load("denial_model.joblib")
 
 # Embedding model + vector DB for RAG retrieval (populated by ingest.py).
 embed_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -197,4 +201,25 @@ def ask(question: Question):
         "category": validated.category,
         "needs_human": validated.needs_human,
         "sources": sources_list,
+    }
+
+class ClaimFeatures(BaseModel):
+    provider_name: str
+    diagnosis_code: str
+    claim_amount: float
+    claim_month: int
+
+
+@app.post("/predict")
+def predict_denial(claim: ClaimFeatures):
+    # Encode the incoming claim the same way training data was encoded,
+    # then force the exact training column layout: missing dummy columns
+    # get 0, unknown ones are dropped.
+    input_df = pd.get_dummies(pd.DataFrame([claim.model_dump()]))
+    input_df = input_df.reindex(columns=model_columns, fill_value=0)
+
+    risk = float(denial_model.predict_proba(input_df)[0, 1])
+    return {
+        "denial_risk": round(risk, 3),
+        "flag_for_review": risk >= 0.35,
     }

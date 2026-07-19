@@ -8,3 +8,4 @@ python-dotenv
 sentence-transformers
 chromadb
 langchain-text-splitters
+scikit-learn
