@@ -1,3 +1,9 @@
+"""Data pipeline: raw claims CSV -> clean -> SQLite.
+
+Run after generate_data.py:
+    python pipeline.py
+"""
+
 import sqlite3
 import pandas as pd
 
@@ -14,20 +20,20 @@ before = len(df)
 df = df.drop_duplicates()
 print(f"removed {before - len(df)} duplicates")
 
-# 2b. normalize status: strip spaces, lowercase  ('APPROVED', 'Denied ' -> 'approved', 'denied')
+# 2b. normalize status: strip spaces, lowercase ('APPROVED', 'Denied ' -> 'approved', 'denied')
 df["status"] = df["status"].str.strip().str.lower()
 
-# 2c. fix negative amounts (data-entry errors -> flip sign)
+# 2c. fix negative amounts (data-entry errors -> flip sign rather than drop the row)
 negatives = (df["claim_amount"] < 0).sum()
 df["claim_amount"] = df["claim_amount"].abs()
 print(f"fixed {negatives} negative amounts")
 
-`# 2d. missing provider names -> explicit 'UNKNOWN' (empty strings hide problems; labels expose them)
+# 2d. missing provider names -> explicit 'UNKNOWN' (empty strings hide problems; labels expose them)
 df["provider_name"] = df["provider_name"].fillna("UNKNOWN")
 missing = (df["provider_name"] == "UNKNOWN").sum()
 print(f"labeled {missing} missing providers")
 
-# 3. STORE
+# 3. STORE — if_exists="replace" makes the pipeline safely re-runnable
 conn = sqlite3.connect(DB_FILE)
 df.to_sql("claims", conn, if_exists="replace", index=False)
 conn.close()

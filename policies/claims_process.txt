@@ -1,0 +1,18 @@
+CLAIMS SUBMISSION AND PROCESSING RULES
+
+Submission deadline: All claims must be submitted within 90 days of the date of
+service. Claims submitted after 90 days are automatically denied, unless the
+provider documents a valid delay reason (system outage, member hospitalization).
+
+Required fields: Every claim must include the member ID, provider NPI number,
+diagnosis code (ICD-10), procedure code (CPT), date of service, and billed amount.
+Claims missing any required field are rejected and returned to the provider,
+not denied. Rejected claims can be corrected and resubmitted without penalty.
+
+Processing time: Clean claims are processed within 15 business days. Claims
+flagged for manual review may take up to 30 business days. Members can check
+claim status online or by calling member services.
+
+Duplicate claims: A claim with the same member, provider, procedure code, and
+date of service as an existing claim is flagged as a duplicate and denied.
+Providers should not resubmit a claim while the original is still processing.

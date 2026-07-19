@@ -2,5 +2,12 @@
     "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     "python.terminal.activateEnvironment": true,
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000
+    "files.autoSaveDelay": 1000,
+    "python-envs.pythonProjects": [
+        {
+            "path": "policies",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }

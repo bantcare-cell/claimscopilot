@@ -9,6 +9,9 @@ __pycache__/
 claims_raw.csv
 *.db
 
+# vector DB — regenerated from policies/ via ingest.py
+chroma_db/
+
 # secrets — API keys live here, NEVER in git
 .env
 
